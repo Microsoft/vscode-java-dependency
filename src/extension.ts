@@ -20,10 +20,7 @@ function activateExtension(operationId: string, context: ExtensionContext) {
     Services.initialize(context);
     Settings.initialize(context);
 
-    const projectController: ProjectController = new ProjectController(context);
-    const instrumented = instrumentOperation(Commands.JAVA_PROJECT_CREATE, () => projectController.createJavaProject());
-    context.subscriptions.push(commands.registerCommand(Commands.JAVA_PROJECT_CREATE, instrumented));
-
+    context.subscriptions.push(new ProjectController(context));
     context.subscriptions.push(new DependencyExplorer(context));
 }
 

@@ -25,6 +25,8 @@ public class CommandHandler implements IDelegateCommandHandler {
             switch (commandId) {
                 case "java.project.list":
                     return ProjectCommand.execute(arguments, monitor);
+                case "java.project.updateFilters":
+                    return ProjectCommand.updateFilters(arguments, monitor);
                 case "java.getPackageData":
                     return PackageCommand.getChildren(arguments, monitor);
                 case "java.resolvePath":

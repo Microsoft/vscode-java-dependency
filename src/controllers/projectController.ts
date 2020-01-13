@@ -3,14 +3,28 @@
 
 import * as fse from "fs-extra";
 import * as _ from "lodash";
+import * as micromatch from "micromatch";
 import * as path from "path";
-import { commands, ExtensionContext, Uri, window, workspace } from "vscode";
+import { commands, ConfigurationChangeEvent, Disposable, ExtensionContext, Uri, window, workspace } from "vscode";
+import { instrumentOperation } from "vscode-extension-telemetry-wrapper";
 import * as xml2js from "xml2js";
+import { Commands } from "../commands";
+import { Jdtls } from "../java/jdtls";
 import { Utility } from "../utility";
 
-export class ProjectController {
-    constructor(public readonly context: ExtensionContext) {
+export class ProjectController implements Disposable {
+    public constructor(public readonly context: ExtensionContext) {
+        context.subscriptions.push(commands.registerCommand(Commands.JAVA_PROJECT_CREATE,
+            instrumentOperation(Commands.JAVA_PROJECT_CREATE, () => this.createJavaProject())));
+        context.subscriptions.push(workspace.onDidChangeConfiguration((e: ConfigurationChangeEvent) => {
+            if (e.affectsConfiguration("files.exclude")) {
+                this.refreshExcludeFilters();
+            }
+        }));
+        this.refreshExcludeFilters();
     }
+
+    public dispose() {}
 
     public async createJavaProject() {
         const javaVersion: number = await this.getJavaVersion();
@@ -95,5 +109,19 @@ export class ProjectController {
             return;
         }
         return javaVersion;
+    }
+
+    private async refreshExcludeFilters() {
+        const patterns: string[] = [];
+        const excludeSetting = workspace.getConfiguration("files", null).get<{ [pattern: string]: boolean }>("exclude");
+        for (const pattern of  Object.keys(excludeSetting)) {
+            if (excludeSetting[pattern]) {
+                patterns.push(micromatch.makeRe(pattern).source);
+            }
+        }
+        const filterUpated = await Jdtls.updateFilters(patterns);
+        if (filterUpated) {
+            await commands.executeCommand(Commands.VIEW_PACKAGE_REFRESH, /* debounce = */true);
+        }
     }
 }

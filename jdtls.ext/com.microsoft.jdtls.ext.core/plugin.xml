@@ -4,6 +4,7 @@
 <extension point="org.eclipse.jdt.ls.core.delegateCommandHandler">
         <delegateCommandHandler class="com.microsoft.jdtls.ext.core.CommandHandler">
             <command id="java.project.list"/>
+            <command id="java.project.updateFilters"/>
             <command id="java.getPackageData"/>
             <command id="java.resolvePath" />
         </delegateCommandHandler>

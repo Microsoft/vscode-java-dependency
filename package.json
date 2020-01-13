@@ -219,6 +219,7 @@
     "@types/fs-extra": "^5.0.4",
     "@types/glob": "^7.1.1",
     "@types/lodash": "^4.14.139",
+    "@types/micromatch": "^3.1.1",
     "@types/mocha": "^5.2.5",
     "@types/node": "^8.10.36",
     "@types/vscode": "1.30.0",
@@ -241,6 +242,7 @@
     "find-java-home": "^0.2.0",
     "fs-extra": "^7.0.1",
     "lodash": "^4.17.15",
+    "micromatch": "^4.0.2",
     "vscode-extension-telemetry-wrapper": "^0.4.0",
     "xml2js": "^0.4.19"
   }
