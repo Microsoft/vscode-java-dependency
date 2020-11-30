@@ -39,3 +39,12 @@ script:
 - gulp build_server
 - vsce package
 - npm test
+
+after_failure:
+- | 
+  if [ "$TRAVIS_OS_NAME" = "osx" ]; then 
+    find $HOME/Library/Application\ Support/Code/User/workspaceStorage/*/redhat.java/jdt_ws/.metadata/.log -print -exec cat '{}' \;;
+  fi;
+- if [ "$TRAVIS_OS_NAME" = "linux" ]; then
+    find $HOME/.config/Code/User/workspaceStorage/*/redhat.java/jdt_ws/.metadata/.log -print -exec cat '{}' \;;
+  fi;

@@ -15,6 +15,7 @@ import { syncHandler } from "./syncHandler";
 import { DependencyExplorer } from "./views/dependencyExplorer";
 
 export async function activate(context: ExtensionContext): Promise<any> {
+    contextManager.initialize(context);
     await initializeFromJsonFile(context.asAbsolutePath("./package.json"), { firstParty: true });
     return instrumentOperation("activation", activateExtension)(context);
 }
@@ -56,7 +57,6 @@ async function activateExtension(_operationId: string, context: ExtensionContext
         }
 
         Settings.initialize(context);
-        contextManager.initialize(context);
 
         context.subscriptions.push(new LibraryController(context));
         context.subscriptions.push(DependencyExplorer.getInstance(context));

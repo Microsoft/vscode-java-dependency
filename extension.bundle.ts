@@ -17,7 +17,6 @@ export { ProjectNode } from "./src/views/projectNode";
 export { WorkspaceNode } from "./src/views/workspaceNode";
 
 // project view test
+export { Context } from "./src/constants";
 export { contextManager } from "./src/contextManager";
 export { DependencyExplorer } from "./src/views/dependencyExplorer";
-export { Commands } from "./src/commands";
-export { LanguageServerMode } from "./src/extension";
