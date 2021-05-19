@@ -21,6 +21,7 @@ import { IExportJarStepExecutor } from "./IExportJarStepExecutor";
 import { IClasspath, IStepMetadata } from "./IStepMetadata";
 import { IMainClassInfo } from "./ResolveMainClassExecutor";
 import {
+    disposeLastTerminal,
     ExportJarConstants, ExportJarMessages, ExportJarStep, failMessage, getExtensionApi,
     resetStepMetadata, stepMap, successMessage, toPosixPath, toWinPath,
 } from "./utility";
@@ -55,7 +56,7 @@ export async function executeExportJarTask(node?: INodeData): Promise<void> {
             throw new Error(ExportJarMessages.stepErrorMessage(ExportJarMessages.StepAction.FINDEXECUTOR, ExportJarStep.ResolveJavaProject));
         }
         await resolveJavaProjectExecutor.execute(stepMetadata);
-        tasks.executeTask(ExportJarTaskProvider.getTask(stepMetadata));
+        tasks.executeTask(ExportJarTaskProvider.getDefaultTask(stepMetadata));
     } catch (err) {
         if (err) {
             failMessage(`${err}`);
@@ -68,20 +69,20 @@ export class ExportJarTaskProvider implements TaskProvider {
 
     public static exportJarType: string = "java";
 
-    public static getTask(stepMetadata: IStepMetadata): Task {
+    public static getDefaultTask(stepMetadata: IStepMetadata): Task {
         if (!stepMetadata.workspaceFolder) {
             throw new Error(ExportJarMessages.fieldUndefinedMessage(ExportJarMessages.Field.WORKSPACEFOLDER, ExportJarStep.ResolveTask));
         }
         const defaultDefinition: IExportJarTaskDefinition = {
             type: ExportJarTaskProvider.exportJarType,
-            label: `${ExportJarTaskProvider.exportJarType}: exportjar:default`,
+            label: "exportjar:default",
             targetPath: Settings.getExportJarTargetPath(),
             elements: [],
             mainClass: undefined,
         };
         const task: Task = new Task(defaultDefinition, stepMetadata.workspaceFolder, "exportjar:default", ExportJarTaskProvider.exportJarType,
             new CustomExecution(async (resolvedDefinition: TaskDefinition): Promise<Pseudoterminal> => {
-                return new ExportJarTaskTerminal(resolvedDefinition, stepMetadata);
+                return new ExportJarTaskTerminal(resolvedDefinition, stepMetadata, false);
             }));
         task.presentationOptions.reveal = TaskRevealKind.Never;
         return task;
@@ -102,7 +103,7 @@ export class ExportJarTaskProvider implements TaskProvider {
                     elements: [],
                     classpaths: [],
                 };
-                return new ExportJarTaskTerminal(resolvedDefinition, stepMetadata);
+                return new ExportJarTaskTerminal(resolvedDefinition, stepMetadata, isExportingJar);
             }));
         resolvedTask.presentationOptions.reveal = TaskRevealKind.Never;
         return resolvedTask;
@@ -149,7 +150,7 @@ export class ExportJarTaskProvider implements TaskProvider {
                         elements: [],
                         classpaths: [],
                     };
-                    return new ExportJarTaskTerminal(resolvedDefinition, stepMetadata);
+                    return new ExportJarTaskTerminal(resolvedDefinition, stepMetadata, isExportingJar);
                 }), undefined);
             defaultTask.presentationOptions.reveal = TaskRevealKind.Never;
             this.tasks.push(defaultTask);
@@ -167,15 +168,25 @@ class ExportJarTaskTerminal implements Pseudoterminal {
     public onDidClose?: Event<void> = this.closeEmitter.event;
 
     private stepMetadata: IStepMetadata;
+    private isBusy: boolean;
+    private terminalLabel: string | undefined;
 
-    constructor(exportJarTaskDefinition: IExportJarTaskDefinition, stepMetadata: IStepMetadata) {
+    constructor(exportJarTaskDefinition: IExportJarTaskDefinition, stepMetadata: IStepMetadata, isBusy: boolean) {
         this.stepMetadata = stepMetadata;
         this.stepMetadata.mainClass = exportJarTaskDefinition.mainClass;
         this.stepMetadata.outputPath = exportJarTaskDefinition.targetPath;
         this.stepMetadata.elements = exportJarTaskDefinition.elements || [];
+        this.terminalLabel = exportJarTaskDefinition.label;
+        this.isBusy = isBusy;
     }
 
     public async open(_initialDimensions: TerminalDimensions | undefined): Promise<void> {
+        if (this.isBusy) {
+            this.closeEmitter.fire();
+            disposeLastTerminal(this.terminalLabel);
+            return;
+        }
+        isExportingJar = true;
         let exportResult: boolean | undefined;
         try {
             if (!this.stepMetadata.workspaceFolder) {

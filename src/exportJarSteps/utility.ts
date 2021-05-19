@@ -153,3 +153,14 @@ export async function getExtensionApi(): Promise<any> {
     }
     return extensionApi;
 }
+
+export function disposeLastTerminal(name: string | undefined): void {
+    if (!name) {
+        return;
+    }
+    const terminals = window.terminals;
+    const presenterTerminals = terminals.filter((terminal) => terminal.name.indexOf(name) >= 0);
+    if (presenterTerminals.length > 0) {
+        presenterTerminals[presenterTerminals.length - 1].dispose();
+    }
+}
