@@ -1,0 +1,10 @@
+{
+	"folders": [
+		{
+			"path": "maven"
+		}
+	],
+	"settings": {
+		"java.server.launchMode": "Standard"
+	}
+}

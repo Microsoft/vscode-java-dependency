@@ -18,6 +18,7 @@ extension.bundle.ts
 javaConfig.json
 .github/**
 images
+test-resources
 
 # Ignore output of code sign
 server/*.md

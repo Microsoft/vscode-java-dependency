@@ -583,6 +583,7 @@
     "compile": "tsc -p . && webpack --config webpack.config.js",
     "watch": "webpack --mode development --watch --info-verbosity verbose",
     "test": "tsc -p . && node ./dist/test/index.js",
+    "test-ui": "tsc -p . && node ./dist/test/ui/index.js",
     "build-server": "./node_modules/.bin/gulp build_server",
     "vscode:prepublish": "tsc -p ./ && webpack --mode production"
   },
@@ -604,6 +605,8 @@
     "tslint": "^5.20.1",
     "typescript": "^3.9.9",
     "vscode-test": "^1.5.1",
+    "vscode-extension-tester": "^4.1.1",
+    "vscode-extension-tester-native": "^3.0.2",
     "webpack": "^4.46.0",
     "webpack-cli": "^3.3.12"
   },

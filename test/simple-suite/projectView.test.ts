@@ -2,8 +2,10 @@
 // Licensed under the MIT license.
 
 import * as assert from "assert";
-import { ContainerNode, contextManager, DependencyExplorer,
-    PackageRootNode, PrimaryTypeNode, ProjectNode } from "../../extension.bundle";
+import {
+    ContainerNode, contextManager, DependencyExplorer,
+    PackageRootNode, PrimaryTypeNode, ProjectNode,
+} from "../../extension.bundle";
 import { fsPath, setupTestEnv, Uris } from "../shared";
 
 // tslint:disable: only-arrow-functions
@@ -13,7 +15,6 @@ suite("Simple Project View Tests", () => {
 
     test("Can node render correctly", async function() {
         const explorer = DependencyExplorer.getInstance(contextManager.context);
-
         // validate root nodes
         const roots = await explorer.dataProvider.getChildren();
         assert.equal(roots?.length, 1, "Number of root node should be 1");
