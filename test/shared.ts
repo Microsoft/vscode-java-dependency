@@ -39,6 +39,17 @@ export function truePath(...paths: string[]) {
 }
 
 export async function setupTestEnv() {
-    await extensions.getExtension("redhat.java")!.activate();
+    const javaExt = extensions.getExtension("redhat.java");
+    await javaExt!.activate();
+    const api = javaExt?.exports;
+    while (api.serverMode !== "Standard") {
+        await sleep(2 * 1000/*ms*/);
+    }
     await extensions.getExtension("vscjava.vscode-java-dependency")!.activate();
+}
+
+async function sleep(ms: number) {
+    return new Promise((resolve) => {
+        setTimeout(resolve, ms);
+    });
 }
