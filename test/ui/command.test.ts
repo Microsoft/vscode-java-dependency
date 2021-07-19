@@ -12,7 +12,7 @@ import { DialogHandler, OpenDialog } from "vscode-extension-tester-native";
 // tslint:disable: only-arrow-functions
 const newProjectName = "helloworld";
 const mavenProjectPath = path.join(__dirname, "..", "..", "..", "test", "maven");
-const mavenWorskspacePath = path.join(__dirname, "..", "..", "..", "test", "maven.code-workspace");
+const mavenWorkspacePath = path.join(__dirname, "..", "..", "..", "test", "maven.code-workspace");
 const invisibleProjectPath = path.join(__dirname, "..", "..", "..", "test", "invisible");
 const invisibleWorkspacePath = path.join(__dirname, "..", "..", "..", "test", "invisible.code-workspace");
 const targetPath = path.join(__dirname, "..", "..", "..", "test", "newProject");
@@ -32,7 +32,7 @@ describe("Command Tests", function() {
     it("Test open maven project", async function() {
         await new Workbench().executeCommand("Workspaces: Open Workspace...");
         const dialog: OpenDialog = await DialogHandler.getOpenDialog();
-        await dialog.selectPath(mavenWorskspacePath);
+        await dialog.selectPath(mavenWorkspacePath);
         await dialog.confirm();
         const editorView = new EditorView();
         const editorGroups = await editorView.getEditorGroups();
