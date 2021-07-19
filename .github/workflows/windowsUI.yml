@@ -50,4 +50,4 @@ jobs:
 
     - name: Print language server Log if job failed
       if: ${{ failure() }}
-      run: Get-ChildItem -Path $env:APPDATA/Code/User/workspaceStorage/*/redhat.java/jdt_ws/.metadata/.log | cat
+      run: Get-ChildItem -Path ./test-resources/settings/User/workspaceStorage/*/redhat.java/jdt_ws/.metadata/.log | cat

@@ -50,4 +50,4 @@ jobs:
 
     - name: Print language server Log if job failed
       if: ${{ failure() }}
-      run: find $HOME/Library/Application\ Support/Code/User/workspaceStorage/*/redhat.java/jdt_ws/.metadata/.log -print -exec cat '{}' \;;
+      run: find ./test-resources/settings/User/workspaceStorage/*/redhat.java/jdt_ws/.metadata/.log -print -exec cat '{}' \;;
