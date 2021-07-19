@@ -65,7 +65,7 @@ describe("Command Tests", function() {
         assert.ok(section.isExpanded(), `Section "Java Projects" should be expanded`);
     });
 
-    it("Test java.view.package.linkWithFolderExplorer", async function() {
+    (platform() === "darwin" ? it.skip : it)("Test java.view.package.linkWithFolderExplorer", async function() {
         const fileSections = await new SideBarView().getContent().getSections();
         await fileSections[0].expand();
         const srcNode = await fileSections[0].findItem("src") as TreeItem;
@@ -94,7 +94,7 @@ describe("Command Tests", function() {
         await packageNode.collapse();
     });
 
-    it("Test java.view.package.unLinkWithFolderExplorer", async function() {
+    (platform() === "darwin" ? it.skip : it)("Test java.view.package.unLinkWithFolderExplorer", async function() {
         const section = await new SideBarView().getContent().getSection("Java Projects");
         const moreActions = await section.moreActions();
         const desynchronize = await moreActions?.getItem("Desynchronize with Editor");
