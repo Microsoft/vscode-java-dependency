@@ -144,11 +144,11 @@ describe("Command Tests", function() {
         await item.click();
         const contextMenu = await item.openContextMenu();
         const newPackageItem = await contextMenu.getItem("New Package");
-        assert.ok(newPackageItem, `"New Package" should be found in context menu`)
+        assert.ok(newPackageItem, `"New Package" should be found in context menu`);
         await newPackageItem!.click();
         let inputBox = await InputBox.create();
         const quickPick = await inputBox.findQuickPick("src/main/java");
-        assert.ok(quickPick, `"src/main/java" should be found in quickpick items`)
+        assert.ok(quickPick, `"src/main/java" should be found in quickpick items`);
         await quickPick!.click();
         inputBox = await InputBox.create();
         await inputBox.setText("com.mycompany.app2");
@@ -172,7 +172,7 @@ describe("Command Tests", function() {
         const fileNode = await fileExplorerSections[0].findItem("App.java") as TreeItem;
         const menu = await fileNode.openContextMenu();
         const revealItem = await menu.getItem("Reveal in Java Project Explorer");
-        assert.ok(revealItem, `Item "Reveal in Java Project Explorer" should be found in context menu`)
+        assert.ok(revealItem, `Item "Reveal in Java Project Explorer" should be found in context menu`);
         await revealItem!.click();
         const classNode = await section.findItem("App") as TreeItem;
         assert.ok(await classNode.isDisplayed(), `Class Node "App" should be revealed`);
@@ -213,7 +213,7 @@ describe("Command Tests", function() {
         await classNode.click();
         const menu = await classNode.openContextMenu();
         const deleteItem = await menu.getItem("Delete");
-        assert.ok(deleteItem, `"Delete" item should be found`)
+        assert.ok(deleteItem, `"Delete" item should be found`);
         await deleteItem!.click();
         const dialog = new ModalDialog();
         const buttons = await dialog.getButtons();
