@@ -34,8 +34,9 @@ describe("Command Tests", function() {
         const dialog: OpenDialog = await DialogHandler.getOpenDialog();
         await dialog.selectPath(mavenWorkspacePath);
         await dialog.confirm();
-        const editorView = new EditorView();
-        const editorGroups = await editorView.getEditorGroups();
+        // To close welcome editors
+        let editorView = new EditorView();
+        let editorGroups = await editorView.getEditorGroups();
         for (const editorGroup of editorGroups) {
             await editorGroup.closeAllEditors();
         }
@@ -46,6 +47,12 @@ describe("Command Tests", function() {
         await refreshSetting.setValue(true);
         const viewSetting = await settingsEditor.findSetting("Package Presentation", "Java", "Dependency");
         await viewSetting.setValue("flat");
+        // To close setting editor
+        editorView = new EditorView();
+        editorGroups = await editorView.getEditorGroups();
+        for (const editorGroup of editorGroups) {
+            await editorGroup.closeAllEditors();
+        }
         await sleep(1000);
         const fileSections = await new SideBarView().getContent().getSections();
         await fileSections[0].collapse();
@@ -55,14 +62,10 @@ describe("Command Tests", function() {
     it("Test javaProjectExplorer.focus", async function() {
         await new Workbench().executeCommand("javaProjectExplorer.focus");
         const section = await new SideBarView().getContent().getSection("Java Projects");
-        assert.ok(section.isExpanded());
+        assert.ok(section.isExpanded(), `Section "Java Projects" should be expanded`);
     });
 
     it("Test java.view.package.linkWithFolderExplorer", async function() {
-        // currently vscode-extension-test framework doesn't support overflow button, so we edit the setting directly.
-        const settingsEditor = await new Workbench().openSettings();
-        const setting = await settingsEditor.findSetting("Sync With Folder Explorer", "Java", "Dependency");
-        await setting.setValue(true);
         const fileSections = await new SideBarView().getContent().getSections();
         await fileSections[0].expand();
         const srcNode = await fileSections[0].findItem("src") as TreeItem;
@@ -85,54 +88,50 @@ describe("Command Tests", function() {
             }
             assert.fail(`get package node failed. Visible items are: ${visibleItems}`);
         }
-        assert.ok(await packageNode.isExpanded());
+        assert.ok(await packageNode.isExpanded(), `Package node "com.mycompany.app" should be expanded`);
         const classNode = await section.findItem("App") as TreeItem;
-        assert.ok(await classNode.isDisplayed());
+        assert.ok(await classNode.isDisplayed(), `Class node "App" should be revealed`);
         await packageNode.collapse();
     });
 
     it("Test java.view.package.unLinkWithFolderExplorer", async function() {
-        // currently vscode-extension-test framework doesn't support overflow button, so we edit the setting directly.
-        const settingsEditor = await new Workbench().openSettings();
-        const setting = await settingsEditor.findSetting("Sync With Folder Explorer", "Java", "Dependency");
-        await setting.setValue(false);
+        const section = await new SideBarView().getContent().getSection("Java Projects");
+        const moreActions = await section.moreActions();
+        const desynchronize = await moreActions?.getItem("Desynchronize with Editor");
+        await desynchronize?.click();
         const fileSections = await new SideBarView().getContent().getSections();
         await fileSections[0].expand();
         const fileNode = await fileSections[0].findItem("App.java") as TreeItem;
         await fileNode.click();
         await sleep(1000);
         await fileSections[0].collapse();
-        const section = await new SideBarView().getContent().getSection("Java Projects");
         await section.expand();
         const packageNode = await section.findItem("com.mycompany.app") as TreeItem;
-        assert.ok(!await packageNode.isExpanded());
+        assert.ok(!await packageNode.isExpanded(), `Package "com.mycompany.app" should not be expanded`);
     });
 
     it("Test java.view.package.newJavaClass", async function() {
         const section = await new SideBarView().getContent().getSection("Java Projects");
         const item = await section.findItem("my-app") as TreeItem;
-        if (!item) {
-            assert.fail("can't find project node `my-app`");
-        }
+        assert.ok(item, `Project "my-app" should be found`);
         await item.click();
         const button = await item.getActionButton("New Java Class");
-        if (!button) {
-            assert.fail("can't find button `New Java Class`");
-        }
-        await button?.click();
+        assert.ok(button, `Button "New Java Class" should be found`);
+        await button!.click();
         let inputBox = await InputBox.create();
-        assert.ok(await inputBox.getPlaceHolder() === "Choose a source folder");
+        assert.ok(await inputBox.getPlaceHolder() === "Choose a source folder", `InputBox "Choose a source folder" should appear`);
         const quickPick = await inputBox.findQuickPick("src/main/java");
-        await quickPick?.click();
+        assert.ok(quickPick, `Quickpick item "src/main/java" should be found`);
+        await quickPick!.click();
         inputBox = await InputBox.create();
-        assert.ok(await inputBox.getPlaceHolder() === "Input the class name");
+        assert.ok(await inputBox.getPlaceHolder() === "Input the class name", `InputBox "Input the class name" should appear`);
         await inputBox.setText("App2");
         await inputBox.confirm();
         await sleep(1000);
         const editor = new TextEditor();
         await editor.save();
-        assert.ok(await editor.getTitle() === "App2.java");
-        assert.ok(await fse.pathExists(path.join(mavenProjectPath, "src", "main", "java", "App2.java")));
+        assert.ok(await editor.getTitle() === "App2.java", `Editor's title should be "App2.java"`);
+        assert.ok(await fse.pathExists(path.join(mavenProjectPath, "src", "main", "java", "App2.java")), `"App2.java" should be created in correct path`);
         await fse.remove(path.join(mavenProjectPath, "src", "main", "java", "App2.java"));
     });
 
@@ -145,17 +144,17 @@ describe("Command Tests", function() {
         await item.click();
         const contextMenu = await item.openContextMenu();
         const newPackageItem = await contextMenu.getItem("New Package");
-        await newPackageItem?.click();
+        assert.ok(newPackageItem, `"New Package" should be found in context menu`)
+        await newPackageItem!.click();
         let inputBox = await InputBox.create();
-        assert.equal(await inputBox.getPlaceHolder(), "Choose a source folder");
         const quickPick = await inputBox.findQuickPick("src/main/java");
-        await quickPick?.click();
+        assert.ok(quickPick, `"src/main/java" should be found in quickpick items`)
+        await quickPick!.click();
         inputBox = await InputBox.create();
-        assert.equal(await inputBox.getPlaceHolder(), "Input the package name");
         await inputBox.setText("com.mycompany.app2");
         await inputBox.confirm();
         await sleep(1000);
-        assert.ok(await fse.pathExists(path.join(mavenProjectPath, "src", "main", "java", "com", "mycompany", "app2")));
+        assert.ok(await fse.pathExists(path.join(mavenProjectPath, "src", "main", "java", "com", "mycompany", "app2")), `New package should be created in correct path`);
         await fse.remove(path.join(mavenProjectPath, "src", "main", "java", "com", "mycompany", "app2"));
     });
 
@@ -172,10 +171,11 @@ describe("Command Tests", function() {
         await folderNode.expand();
         const fileNode = await fileExplorerSections[0].findItem("App.java") as TreeItem;
         const menu = await fileNode.openContextMenu();
-        const copyItem = await menu.getItem("Reveal in Java Project Explorer");
-        await copyItem?.click();
+        const revealItem = await menu.getItem("Reveal in Java Project Explorer");
+        assert.ok(revealItem, `Item "Reveal in Java Project Explorer" should be found in context menu`)
+        await revealItem!.click();
         const classNode = await section.findItem("App") as TreeItem;
-        assert.ok(await classNode.isDisplayed());
+        assert.ok(await classNode.isDisplayed(), `Class Node "App" should be revealed`);
         await fileExplorerSections[0].collapse();
     });
 
@@ -185,8 +185,9 @@ describe("Command Tests", function() {
         const classNode = await section.findItem("AppToRename") as TreeItem;
         await classNode.click();
         const menu = await classNode.openContextMenu();
-        const copyItem = await menu.getItem("Rename");
-        await copyItem?.click();
+        const renameItem = await menu.getItem("Rename");
+        assert.ok(renameItem, `"Rename" item should be found`);
+        await renameItem!.click();
         const inputBox = await InputBox.create();
         await inputBox.setText("AppRenamed");
         await inputBox.confirm();
@@ -202,8 +203,8 @@ describe("Command Tests", function() {
         await sleep(5000);
         const editor = new TextEditor();
         await editor.save();
-        assert.ok(await editor.getTitle() === "AppRenamed.java");
-        assert.ok(await section.findItem("AppRenamed"));
+        assert.ok(await editor.getTitle() === "AppRenamed.java", `Editor's title should be "AppRenamed.java"`);
+        assert.ok(await section.findItem("AppRenamed"), `Item in Java Project section should be "AppRenamed"`);
     });
 
     (platform() === "darwin" ? it.skip : it)("Test java.view.package.moveFileToTrash", async function() {
@@ -211,8 +212,9 @@ describe("Command Tests", function() {
         const classNode = await section.findItem("AppToDelete") as TreeItem;
         await classNode.click();
         const menu = await classNode.openContextMenu();
-        const copyItem = await menu.getItem("Delete");
-        await copyItem?.click();
+        const deleteItem = await menu.getItem("Delete");
+        assert.ok(deleteItem, `"Delete" item should be found`)
+        await deleteItem!.click();
         const dialog = new ModalDialog();
         const buttons = await dialog.getButtons();
         for (const button of buttons) {
@@ -222,7 +224,7 @@ describe("Command Tests", function() {
             }
         }
         await sleep(1000);
-        assert.ok(!await fse.pathExists(path.join(mavenProjectPath, "src", "main", "java", "AppToDelete.java")));
+        assert.ok(!await fse.pathExists(path.join(mavenProjectPath, "src", "main", "java", "AppToDelete.java")), `The source file "AppToDelete.java" should be deleted`);
     });
 
     it("Test change to invisible project", async function() {
@@ -254,7 +256,7 @@ describe("Command Tests", function() {
         const dialog: OpenDialog = await DialogHandler.getOpenDialog();
         await dialog.selectPath(path.join(invisibleProjectPath, "libSource", "jcommander-1.72.jar"));
         await dialog.confirm();
-        assert.ok(await section.findItem("jcommander-1.72.jar"));
+        assert.ok(await section.findItem("jcommander-1.72.jar"), `Library "jcommander-1.72.jar" should be found`);
     });
 
     it("Test java.project.addLibraryFolders", async function() {
@@ -277,8 +279,8 @@ describe("Command Tests", function() {
         await sleep(3000);
         referencedItem = await section.findItem("Referenced Libraries") as TreeItem;
         await referencedItem.expand();
-        assert.ok(await section.findItem("junit-jupiter-api-5.4.1.jar"));
-        assert.ok(await section.findItem("testng-6.8.7.jar"));
+        assert.ok(await section.findItem("junit-jupiter-api-5.4.1.jar"), `Library "junit-jupiter-api-5.4.1.jar" should be found`);
+        assert.ok(await section.findItem("testng-6.8.7.jar"), `Library "testng-6.8.7.jar" should be found`);
     });
 
     it("Test java.project.create", async function() {
@@ -286,7 +288,6 @@ describe("Command Tests", function() {
         await fse.ensureDir(targetPath);
         await new Workbench().executeCommand("java.project.create");
         let inputBox = await InputBox.create();
-        assert.ok(await inputBox.getPlaceHolder() === "Select the project type");
         const picks = await inputBox.getQuickPicks();
         for (const quickPick of picks) {
             if (await quickPick.getLabel() === "No build tools") {
@@ -300,8 +301,8 @@ describe("Command Tests", function() {
         await inputBox.setText(newProjectName);
         await inputBox.confirm();
         await sleep(5000);
-        assert.ok(await fse.pathExists(path.join(targetPath, newProjectName, "src", "App.java")));
-        assert.ok(await fse.pathExists(path.join(targetPath, newProjectName, "README.md")));
+        assert.ok(await fse.pathExists(path.join(targetPath, newProjectName, "src", "App.java")), `The template source file should be created`);
+        assert.ok(await fse.pathExists(path.join(targetPath, newProjectName, "README.md")), `The template README file should be created`);
     });
 });
 

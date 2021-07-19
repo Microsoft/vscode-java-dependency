@@ -143,11 +143,9 @@ suite("Maven Project View Tests", () => {
         const content = await clipboardy.read();
         const contentUri = vscode.Uri.file(content);
         const dataUri = mainClass.nodeData.uri;
-        if (!dataUri) {
-            assert.fail("class node doesn't have correct uri");
-        }
-        const expectedUri = vscode.Uri.parse(dataUri);
-        assert.equal(contentUri.fsPath, expectedUri.fsPath);
+        assert.ok(dataUri, `Class node should have correct uri`);
+        const expectedUri = vscode.Uri.parse(dataUri!);
+        assert.equal(contentUri.fsPath, expectedUri.fsPath, `File path should be copied correctly`);
     });
 
     test("Can execute command java.view.package.copyRelativeFilePath correctly", async function() {
@@ -163,25 +161,19 @@ suite("Maven Project View Tests", () => {
         await new Promise((resolve) => setTimeout(resolve, 1000));
         const content = await clipboardy.read();
         const dataUri = mainClass.nodeData.uri;
-        if (!dataUri) {
-            assert.fail("class node doesn't have correct uri");
-        }
-        const expectedUri = vscode.Uri.parse(dataUri);
+        assert.ok(dataUri, `Class node should have correct uri`);
+        const expectedUri = vscode.Uri.parse(dataUri!);
         const workspaceFolders = vscode.workspace.workspaceFolders;
-        if (!workspaceFolders) {
-            assert.fail("there is no opened workspacefolder");
-        }
-        const relativePath = path.relative(workspaceFolders[0].uri.fsPath, expectedUri.fsPath);
-        assert.equal(content, relativePath);
+        assert.ok(workspaceFolders, `There should be valid workspace folders`);
+        const relativePath = path.relative(workspaceFolders![0].uri.fsPath, expectedUri.fsPath);
+        assert.equal(content, relativePath, `Relative file path should be copied correctly`);
     });
 
     test("Can execute command java.project.list correctly", async function() {
         const workspaceFolders = vscode.workspace.workspaceFolders;
-        if (!workspaceFolders) {
-            assert.fail("there is no opened workspacefolder");
-        }
+        assert.ok(workspaceFolders, `There should be valid workspace folders`);
         const projects = await vscode.commands.executeCommand<INodeData[]>(Commands.EXECUTE_WORKSPACE_COMMAND,
-            Commands.JAVA_PROJECT_LIST, workspaceFolders[0].uri.toString());
+            Commands.JAVA_PROJECT_LIST, workspaceFolders![0].uri.toString());
         assert.equal(projects?.length, 1, "project's length should be 1");
         assert.equal(projects![0].name, "my-app", "project should be my-app");
     });
@@ -193,13 +185,11 @@ suite("Maven Project View Tests", () => {
         const packageRoots = await projectNode.getChildren();
         const mainPackage = packageRoots[0] as PackageRootNode;
         const workspaceFolders = vscode.workspace.workspaceFolders;
-        if (!workspaceFolders) {
-            assert.fail("there is no opened workspacefolder");
-        }
+        assert.ok(workspaceFolders, `There should be valid workspace folders`);
         const packages = await vscode.commands.executeCommand<INodeData[]>(Commands.EXECUTE_WORKSPACE_COMMAND,
             Commands.JAVA_GETPACKAGEDATA, {
                 kind: NodeKind.PackageRoot,
-                projectUri: workspaceFolders[0].uri.toString(),
+                projectUri: workspaceFolders![0].uri.toString(),
                 path: mainPackage.nodeData.name,
                 handlerIdentifier: mainPackage.nodeData.handlerIdentifier,
             });
@@ -224,11 +214,9 @@ suite("Maven Project View Tests", () => {
 
     test("Can execute command java.project.getMainClasses correctly", async function() {
         const workspaceFolders = vscode.workspace.workspaceFolders;
-        if (!workspaceFolders) {
-            assert.fail("there is no opened workspacefolder");
-        }
+        assert.ok(workspaceFolders, `There should be valid workspace folders`);
         const mainClasses = await vscode.commands.executeCommand<IMainClassInfo[]>(Commands.EXECUTE_WORKSPACE_COMMAND,
-            Commands.JAVA_PROJECT_GETMAINCLASSES, workspaceFolders[0].uri.toString());
+            Commands.JAVA_PROJECT_GETMAINCLASSES, workspaceFolders![0].uri.toString());
         assert.equal(mainClasses?.length, 1, "mainClasses' length should be 1");
         assert.equal(mainClasses![0].name, "com.mycompany.app.App", "mainClasses[0]'s name should be com.mycompany.app.App");
     });
