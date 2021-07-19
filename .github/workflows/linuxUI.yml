@@ -55,6 +55,5 @@ jobs:
     - name: Test extension
       run: DISPLAY=:99 npm run test-ui
 
-    - name: Print language server Log if job failed
-      if: ${{ failure() }}
+    - name: Print language server Log
       run: find $HOME/.config/Code/User/workspaceStorage/*/redhat.java/jdt_ws/.metadata/.log -print -exec cat '{}' \;;
