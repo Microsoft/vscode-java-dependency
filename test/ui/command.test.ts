@@ -15,6 +15,7 @@ const mavenProjectPath = path.join(__dirname, "..", "..", "..", "test", "maven")
 const mavenWorkspacePath = path.join(__dirname, "..", "..", "..", "test", "maven.code-workspace");
 const invisibleProjectPath = path.join(__dirname, "..", "..", "..", "test", "invisible");
 const invisibleWorkspacePath = path.join(__dirname, "..", "..", "..", "test", "invisible.code-workspace");
+const fakeWorkspacePath = path.join(__dirname, "..", "..", "..", "test", "gradle.code-workspace");
 const targetPath = path.join(__dirname, "..", "..", "..", "test", "newProject");
 
 describe("Command Tests", function() {
@@ -32,14 +33,14 @@ describe("Command Tests", function() {
     it("Test open fake project", async function() {
         await new Workbench().executeCommand("Workspaces: Open Workspace...");
         const dialog: OpenDialog = await DialogHandler.getOpenDialog();
-        await dialog.selectPath(invisibleWorkspacePath);
+        await dialog.selectPath(fakeWorkspacePath);
         await dialog.confirm();
-        await sleep(1000);
-        const fileExplorerSections = await new SideBarView().getContent().getSections();
-        const folderNode = await fileExplorerSections[0].findItem("src") as TreeItem;
-        await folderNode.expand();
-        const fileNode = await fileExplorerSections[0].findItem("App.java") as TreeItem;
-        await fileNode.click();
+        // To close welcome editors
+        let editorView = new EditorView();
+        let editorGroups = await editorView.getEditorGroups();
+        for (const editorGroup of editorGroups) {
+            await editorGroup.closeAllEditors();
+        }
         await waitForImporting(1000);
     });
 
@@ -48,12 +49,6 @@ describe("Command Tests", function() {
         const dialog: OpenDialog = await DialogHandler.getOpenDialog();
         await dialog.selectPath(mavenWorkspacePath);
         await dialog.confirm();
-        // To close welcome editors
-        let editorView = new EditorView();
-        let editorGroups = await editorView.getEditorGroups();
-        for (const editorGroup of editorGroups) {
-            await editorGroup.closeAllEditors();
-        }
         const settingsEditor = await new Workbench().openSettings();
         const setting = await settingsEditor.findSetting("Dialog Style", "Window");
         await setting.setValue("custom");
