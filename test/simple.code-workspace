@@ -1,0 +1,10 @@
+{
+	"folders": [
+		{
+			"path": "simple"
+		}
+	],
+	"settings": {
+		"java.server.launchMode": "Standard"
+	}
+}

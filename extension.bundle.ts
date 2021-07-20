@@ -15,6 +15,7 @@ export { PackageRootNode } from "./src/views/packageRootNode";
 export { PrimaryTypeNode } from "./src/views/PrimaryTypeNode";
 export { ProjectNode } from "./src/views/projectNode";
 export { WorkspaceNode } from "./src/views/workspaceNode";
+export { IMainClassInfo } from "./src/exportJarSteps/ResolveMainClassExecutor";
 
 // project view test
 export { contextManager } from "./src/contextManager";

@@ -7,7 +7,7 @@ import { downloadAndUnzipVSCode, resolveCliPathFromVSCodeExecutablePath, runTest
 
 async function main(): Promise<void> {
     try {
-        const vscodeExecutablePath = await downloadAndUnzipVSCode();
+        const vscodeExecutablePath = await downloadAndUnzipVSCode("1.57.0");
         const cliPath = resolveCliPathFromVSCodeExecutablePath(vscodeExecutablePath);
 
         // Resolve redhat.java dependency
@@ -59,6 +59,16 @@ async function main(): Promise<void> {
             extensionTestsPath: path.resolve(__dirname, "./gradle-suite"),
             launchArgs: [
                 path.join(__dirname, "..", "..", "test", "gradle"),
+            ],
+        });
+
+        // Run test for invisible project
+        await runTests({
+            vscodeExecutablePath,
+            extensionDevelopmentPath,
+            extensionTestsPath: path.resolve(__dirname, "./invisible-suite"),
+            launchArgs: [
+                path.join(__dirname, "..", "..", "test", "invisible"),
             ],
         });
 

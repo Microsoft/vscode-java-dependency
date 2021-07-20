@@ -1,0 +1,13 @@
+{
+	"folders": [
+		{
+			"path": "invisible"
+		}
+	],
+	"settings": {
+		"java.server.launchMode": "Standard",
+		"java.project.referencedLibraries": [
+			"lib/**/*.jar"
+		]
+	}
+}
