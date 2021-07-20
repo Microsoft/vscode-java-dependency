@@ -36,8 +36,8 @@ describe("Command Tests", function() {
         await dialog.selectPath(fakeWorkspacePath);
         await dialog.confirm();
         // To close welcome editors
-        let editorView = new EditorView();
-        let editorGroups = await editorView.getEditorGroups();
+        const editorView = new EditorView();
+        const editorGroups = await editorView.getEditorGroups();
         for (const editorGroup of editorGroups) {
             await editorGroup.closeAllEditors();
         }
@@ -57,8 +57,8 @@ describe("Command Tests", function() {
         const viewSetting = await settingsEditor.findSetting("Package Presentation", "Java", "Dependency");
         await viewSetting.setValue("flat");
         // To close setting editor
-        editorView = new EditorView();
-        editorGroups = await editorView.getEditorGroups();
+        const editorView = new EditorView();
+        const editorGroups = await editorView.getEditorGroups();
         for (const editorGroup of editorGroups) {
             await editorGroup.closeAllEditors();
         }
