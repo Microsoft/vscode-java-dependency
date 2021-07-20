@@ -15,7 +15,7 @@ const mavenProjectPath = path.join(__dirname, "..", "..", "..", "test", "maven")
 const mavenWorkspacePath = path.join(__dirname, "..", "..", "..", "test", "maven.code-workspace");
 const invisibleProjectPath = path.join(__dirname, "..", "..", "..", "test", "invisible");
 const invisibleWorkspacePath = path.join(__dirname, "..", "..", "..", "test", "invisible.code-workspace");
-const fakeWorkspacePath = path.join(__dirname, "..", "..", "..", "test", "gradle.code-workspace");
+const fakeWorkspacePath = path.join(__dirname, "..", "..", "..", "test", "simple.code-workspace");
 const targetPath = path.join(__dirname, "..", "..", "..", "test", "newProject");
 
 describe("Command Tests", function() {
