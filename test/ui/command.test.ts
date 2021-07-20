@@ -29,6 +29,20 @@ describe("Command Tests", function() {
         await sleep(5000);
     });
 
+    it("Test open fake project", async function() {
+        await new Workbench().executeCommand("Workspaces: Open Workspace...");
+        const dialog: OpenDialog = await DialogHandler.getOpenDialog();
+        await dialog.selectPath(invisibleWorkspacePath);
+        await dialog.confirm();
+        await sleep(1000);
+        const fileExplorerSections = await new SideBarView().getContent().getSections();
+        const folderNode = await fileExplorerSections[0].findItem("src") as TreeItem;
+        await folderNode.expand();
+        const fileNode = await fileExplorerSections[0].findItem("App.java") as TreeItem;
+        await fileNode.click();
+        await waitForImporting(1000);
+    });
+
     it("Test open maven project", async function() {
         await new Workbench().executeCommand("Workspaces: Open Workspace...");
         const dialog: OpenDialog = await DialogHandler.getOpenDialog();
